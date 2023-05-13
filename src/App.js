@@ -1,23 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
+import "./App.css";
 
 function App() {
-  return (
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  const handleChange = event => {
+    setQuery(event.target.value);
+  };
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    axios
+      .get(`https://www.omdbapi.com/?s=${query}&apikey=cfc9a617`)
+      .then(response => {
+        setResults(response.data.Search);
+      })
+      .catch(error => console.log(error));
+  };
+
+ return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Movie Search App</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={query} onChange={handleChange} />
+        <button type="submit">Search</button>
+      </form>
+      <div className="results">
+        {results.map(result => (
+          <div key={result.imdbID}>
+            <img src={result.Poster} alt={result.Title} />
+            <h2>{result.Title}</h2>
+            <p>{result.Year}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
